@@ -1,0 +1,1 @@
+cat docker_swarm_master_token_output.txt | grep 'docker swarm join' | sed -e "s/To add.*//" | sed -e "s/    //"

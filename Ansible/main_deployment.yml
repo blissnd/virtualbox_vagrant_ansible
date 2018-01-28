@@ -8,6 +8,8 @@
       - ssh_config
       - bashrc
       - ssh_private_key_distribution
+      - docker_install
+      - docker_swarm_master_config
 
 -   hosts:
     - slaves
@@ -18,3 +20,5 @@
       - ssh_config
       - bashrc
       - ssh_private_key_distribution
+      - docker_install
+      - docker_swarm_slave_config

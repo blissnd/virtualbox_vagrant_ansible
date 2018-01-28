@@ -1,0 +1,4 @@
+---
+- name: add slave to swarm
+  shell:  "{{hostvars['192.168.2.10']['docker_swarm_join_command']}}"
+  

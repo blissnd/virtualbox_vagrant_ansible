@@ -1,0 +1,30 @@
+---
+- name: create swarm
+  shell:  "docker swarm init --advertise-addr 192.168.2.10"
+  register: docker_swarm_master_token_output
+
+- debug:  msg="{{docker_swarm_master_token_output.stdout}}"
+
+- name: write swarm token output to file
+  shell:  echo "{{docker_swarm_master_token_output.stdout}}" > docker_swarm_master_token_output.txt
+  args:
+    chdir: /home/vagrant/
+  
+- name: store swarm command
+  template:
+    src: "swarm_command.j2"
+    dest: "/home/vagrant/swarm_command.sh"
+    mode: 0555
+
+- name: extract swarm token command
+  shell:  /home/vagrant/swarm_command.sh
+  args:
+    chdir: /home/vagrant/
+  register: docker_swarm_join_output
+
+- name: assign to variable
+  set_fact:
+    docker_swarm_join_command: "{{docker_swarm_join_output.stdout}}"
+    cacheable: true
+
+- debug:  msg="{{docker_swarm_join_command}}"
