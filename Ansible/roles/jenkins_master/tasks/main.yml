@@ -14,10 +14,49 @@
   shell:  docker pull jenkins/jenkins  
 
 - file:
-    path: /home/vagrant/jenkins_home
+    path: "{{ home_dir }}/jenkins_home"
     state: directory
     mode: 0775
 
+- name: copy VM-2 private ssh key to jenkins directory for use by the jenkins master docker container
+  copy:  
+      src: ../../.vagrant/machines/VM-2/virtualbox/private_key
+      dest: "{{ home_dir }}/jenkins_home/vm-2_priv_ssh_key"
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: 0600
+
+- name: copy jenkins credentials template to jenkins master
+  template:
+    src: "credentials.xml.j2"
+    dest: "{{ home_dir }}/jenkins_home/credentials.xml"
+    mode: 0664
+
+- file:
+    path: "{{ home_dir }}/jenkins_home/nodes"
+    state: directory
+    mode: 0775
+
+- file:
+    path: "{{ home_dir }}/jenkins_home/nodes/{{ item }}"
+    state: directory
+    mode: 0775
+  with_items:
+    - slave1
+    - slave2
+    - slave3
+    
+- name: copy slave ssh config files to jenkins master
+  template:
+    src: "slave_config.xml.j2"
+    dest: "{{ home_dir }}/jenkins_home/nodes/{{ item }}/config.xml"
+    mode: 0664
+  with_items:
+    - slave1
+    - slave2
+    - slave3
+
+### 
 - name: Start jenkins master docker container
   shell:  docker run -p 8080:8080  --rm -d -v /home/vagrant/jenkins_home:/var/jenkins_home jenkins/jenkins
   ignore_errors:  yes

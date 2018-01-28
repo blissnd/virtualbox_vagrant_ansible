@@ -9,20 +9,20 @@
 - name: write swarm token output to file
   shell:  echo "{{docker_swarm_master_token_output.stdout}}" > docker_swarm_master_token_output.txt
   args:
-    chdir: /home/vagrant/
+    chdir: "{{ home_dir }}"
   
 - name: store swarm command
   template:
     src: "swarm_command.j2"
-    dest: "/home/vagrant/swarm_command.sh"
+    dest: "{{ home_dir }}/swarm_command.sh"
     mode: 0555
 
 - name: extract swarm token command
-  shell:  /home/vagrant/swarm_command.sh
+  shell:  "{{ home_dir }}/swarm_command.sh"
   ignore_errors: yes
   #failed_when:  docker_swarm_join_output.stdout.find('already part of a swarm') == 1
   args:
-    chdir: /home/vagrant/
+    chdir: "{{ home_dir }}"
   register: docker_swarm_join_output
   
   
