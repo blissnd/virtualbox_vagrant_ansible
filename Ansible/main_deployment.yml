@@ -9,8 +9,8 @@
       - bashrc
       - ssh_private_key_distribution
       - docker_install
-      - docker_swarm_master_config
-
+      - jenkins_master
+###
 -   hosts:
     - slaves
     vars_files:
@@ -21,4 +21,28 @@
       - bashrc
       - ssh_private_key_distribution
       - docker_install
+###
+-   hosts:
+    - slaves
+    vars_files:
+      - ./variable_definitions/host_vars_vm2.yml
+    remote_user: vagrant
+    roles:
+      - docker_swarm_master_config
+###
+-   hosts:
+    - masters
+    vars_files:
+      - ./variable_definitions/host_vars_vm1.yml
+    remote_user: vagrant
+    roles:
       - docker_swarm_slave_config
+###
+-   hosts:
+    - slaves
+    vars_files:
+      - ./variable_definitions/host_vars_vm2.yml
+    remote_user: vagrant
+    roles:
+      - jenkins_slave
+###

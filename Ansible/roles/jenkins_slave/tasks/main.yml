@@ -1,0 +1,18 @@
+---
+- name: add vagrant user to docker group
+  become: yes
+  user:
+    name: vagrant
+    group: docker
+    append: yes
+
+- name: Newgrp
+  become: yes
+  shell:  newgrp docker
+
+- name: Pull jenkins slave docker container
+  shell:  docker pull jenkinsci/ssh-slave
+
+- name: Start jenkins slave replicas within the swarm's routing mesh and re-use the authorized ssh keys from vagrant
+  shell:  docker service create --name swarm-slave --publish published=2222,target=22 --replicas 4 jenkinsci/ssh-slave "$(cat /home/vagrant/.ssh/authorized_keys)"
+  ignore_errors:  yes

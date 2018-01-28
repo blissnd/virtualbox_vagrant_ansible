@@ -1,7 +1,8 @@
 ---
 - name: create swarm
-  shell:  "docker swarm init --advertise-addr 192.168.2.10"
+  shell:  "docker swarm init --advertise-addr 192.168.2.20"
   register: docker_swarm_master_token_output
+  ignore_errors: yes
 
 - debug:  msg="{{docker_swarm_master_token_output.stdout}}"
 
@@ -18,13 +19,19 @@
 
 - name: extract swarm token command
   shell:  /home/vagrant/swarm_command.sh
+  ignore_errors: yes
+  #failed_when:  docker_swarm_join_output.stdout.find('already part of a swarm') == 1
   args:
     chdir: /home/vagrant/
   register: docker_swarm_join_output
-
+  
+  
 - name: assign to variable
   set_fact:
     docker_swarm_join_command: "{{docker_swarm_join_output.stdout}}"
     cacheable: true
 
 - debug:  msg="{{docker_swarm_join_command}}"
+
+#- name: promote VM-2 to docker swarm manager to be able to start jenkins slave service on VM-2
+# shell:  docker node promote VM-2

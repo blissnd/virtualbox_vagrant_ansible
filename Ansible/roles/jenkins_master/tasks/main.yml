@@ -1,0 +1,23 @@
+---
+- name: add vagrant user to docker group
+  become: yes
+  user:
+    name: vagrant
+    group: docker
+    append: yes
+
+- name: Newgrp
+  become: yes
+  shell:  newgrp docker
+
+- name: Pull jenkins master docker container
+  shell:  docker pull jenkins/jenkins  
+
+- file:
+    path: /home/vagrant/jenkins_home
+    state: directory
+    mode: 0775
+
+- name: Start jenkins master docker container
+  shell:  docker run -p 8080:8080  --rm -d -v /home/vagrant/jenkins_home:/var/jenkins_home jenkins/jenkins
+  ignore_errors:  yes
