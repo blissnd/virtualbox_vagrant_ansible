@@ -1,2 +1,1 @@
 wget -q --auth-no-challenge --user jenkins --password jenkins --output-document - '192.168.2.10:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
-

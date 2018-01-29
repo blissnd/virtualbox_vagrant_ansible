@@ -25,7 +25,6 @@
     chdir: "{{ home_dir }}"
   register: docker_swarm_join_output
   
-  
 - name: assign to variable
   set_fact:
     docker_swarm_join_command: "{{docker_swarm_join_output.stdout}}"

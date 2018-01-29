@@ -1,4 +1,5 @@
 ---
+
 - name: add vagrant user to docker group
   become: yes
   user:
@@ -26,12 +27,6 @@
       group: "{{ username }}"
       mode: 0600
 
-- name: copy jenkins credentials template to jenkins master
-  template:
-    src: "credentials.xml.j2"
-    dest: "{{ home_dir }}/jenkins_home/credentials.xml"
-    mode: 0664
-
 - file:
     path: "{{ home_dir }}/jenkins_home/nodes"
     state: directory
@@ -56,7 +51,60 @@
     - slave2
     - slave3
 
-### 
 - name: Start jenkins master docker container
   shell:  docker run -p 8080:8080  --rm -d -v /home/vagrant/jenkins_home:/var/jenkins_home jenkins/jenkins
   ignore_errors:  yes
+
+- name: delay
+  wait_for: timeout=30
+
+- name: copy command to get jenkins crumb to jenkins master
+  template:
+    src: "jenkins_get_crumb.sh.j2"
+    dest: "{{ home_dir }}/jenkins_get_crumb.sh"
+    mode: 0774
+    
+- name: run command to get crumb, and store crumb
+  shell:  "{{ home_dir }}/jenkins_get_crumb.sh"
+  register: crumb_var
+
+- name: store vm2 ssh key in var
+  shell:  "cat {{ home_dir }}/.ssh/vm-2_priv_ssh_key"
+  register: vm2_key_var
+  
+- name: copy groovy script to jenkins master (vm-1)
+  template:
+    src: "encrypt.groovy.j2"
+    dest: "{{ home_dir }}/encrypt.groovy"
+    mode: 0664
+
+- name: copy curl command script to jenkins master (vm-1)
+  template:
+    src: "groovy_cli_command.sh.j2"
+    dest: "{{ home_dir }}/groovy_cli_command.sh"
+    mode: 0774
+
+- name: run curl command to send & run groovy script
+  shell:  "bash {{ home_dir }}/groovy_cli_command.sh"
+  
+- name: get groovy output from file due to strange stdout behaviour with groovy and/or curl
+  shell:  "cat {{ home_dir }}/groovy_output.txt"
+  register: final_key_var
+  
+- debug:
+    msg={{final_key_var.stdout}}
+
+- name: copy jenkins credentials template to jenkins master
+  template:
+    src: "credentials.xml.j2"
+    dest: "{{ home_dir }}/jenkins_home/credentials.xml"
+    mode: 0664
+
+- name: copy script to restart jenkins
+  template:
+    src: "restart-jenkins.sh.j2"
+    dest: "{{ home_dir }}/restart-jenkins.sh"
+    mode: 0774
+
+- name: run command to restart jenkins
+  shell:  "{{ home_dir }}/restart-jenkins.sh"
