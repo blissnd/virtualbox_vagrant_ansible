@@ -4,13 +4,16 @@
   become: yes
   user:
     name: vagrant
-    group: docker
+    groups: docker,vagrant
     append: yes
 
-- name: Newgrp
-  become: yes
-  shell:  newgrp docker
+#- name: reset ssh connection to allow user changes to affect 'current login user'
+#  meta: reset_connection
 
+- name: checkout basic jenkins home directory config from github
+  shell:  "git clone https://github.com/blissnd/jenkins_home.git {{ home_dir }}/jenkins_home"
+  ignore_errors:  yes
+  
 - name: Pull jenkins master docker container
   shell:  docker pull jenkins/jenkins  
 
@@ -51,12 +54,12 @@
     - slave2
     - slave3
 
-- name: Start jenkins master docker container
+- name: start jenkins master docker container
   shell:  docker run -p 8080:8080  --rm -d -v /home/vagrant/jenkins_home:/var/jenkins_home jenkins/jenkins
   ignore_errors:  yes
 
 - name: delay
-  wait_for: timeout=30
+  wait_for: timeout=20
 
 - name: copy command to get jenkins crumb to jenkins master
   template:
@@ -65,7 +68,7 @@
     mode: 0774
     
 - name: run command to get crumb, and store crumb
-  shell:  "{{ home_dir }}/jenkins_get_crumb.sh"
+  shell:  "bash {{ home_dir }}/jenkins_get_crumb.sh"
   register: crumb_var
 
 - name: store vm2 ssh key in var
@@ -99,12 +102,12 @@
     src: "credentials.xml.j2"
     dest: "{{ home_dir }}/jenkins_home/credentials.xml"
     mode: 0664
-
+ 
 - name: copy script to restart jenkins
   template:
     src: "restart-jenkins.sh.j2"
     dest: "{{ home_dir }}/restart-jenkins.sh"
     mode: 0774
-
+ 
 - name: run command to restart jenkins
   shell:  "{{ home_dir }}/restart-jenkins.sh"

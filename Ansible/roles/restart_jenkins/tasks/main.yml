@@ -1,0 +1,2 @@
+- name: run command to restart jenkins
+  shell:  "{{ home_dir }}/restart-jenkins.sh"

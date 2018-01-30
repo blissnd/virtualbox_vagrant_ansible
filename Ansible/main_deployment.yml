@@ -46,3 +46,11 @@
     roles:
       - jenkins_slave
 ###
+###
+-   hosts:
+    - masters
+    vars_files:
+      - ./variable_definitions/host_vars_vm1.yml
+    remote_user: vagrant
+    roles:
+      - restart_jenkins

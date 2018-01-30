@@ -37,8 +37,6 @@
   shell:  lsb_release -cs
   register: lsb_release_output
   
-- debug:  msg=lsb_release_output.stdout
-
 #- name: test print var
 # shell:  echo {{lsb_release_output.stdout}} > output.txt
 
@@ -52,7 +50,9 @@
 #- name: test print 2nd var
 #  shell:  echo {{shell_output.stdout}} > output2.txt
 
-- apt_repository:
+- name: add correct apt repo
+  become: yes
+  apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{lsb_release_output.stdout}} stable
     state: present
 
@@ -60,5 +60,12 @@
   become:   yes
   apt:
     name=docker-ce
+    state=latest
+    update_cache=yes
+
+- name: install java
+  become:   yes
+  apt:
+    name=openjdk-8-jre-headless
     state=latest
     update_cache=yes

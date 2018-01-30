@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/samsung/Documents/NDB/Technical Work/Development/LINUX/Vagrant","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/samsung/deployement_test/virtualbox_vagrant_ansible","disabled":false,"__vagrantfile":true}}}
