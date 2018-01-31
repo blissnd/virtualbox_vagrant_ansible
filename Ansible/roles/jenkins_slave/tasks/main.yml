@@ -10,7 +10,6 @@
   shell:  docker pull jenkinsci/ssh-slave
 
 - name: Start jenkins slave replicas within the swarm's routing mesh and re-use the authorized ssh keys from vagrant
-  shell:  |
-    docker service create --name swarm-slave --publish published=2222,target=22 --replicas 7 jenkinsci/ssh-slave "$(cat /home/vagrant/.ssh/authorized_keys)" &
-    set timeout 20
+  shell:  docker service create --name swarm-slave --publish published=2222,target=22 --replicas 4 jenkinsci/ssh-slave "$(cat /home/vagrant/.ssh/authorized_keys)"
+  async:  30
   ignore_errors:  yes
