@@ -1,5 +1,4 @@
 ---
-
 - name: add vagrant user to docker group
   become: yes
   user:
@@ -15,8 +14,13 @@
   ignore_errors:  yes
   
 - name: Pull jenkins master docker container
+  become: yes
   shell:  docker pull jenkins/jenkins  
 
+- name: Pull jenkins slave docker container
+  become: yes
+  shell:  docker pull jenkinsci/ssh-slave
+  
 - file:
     path: "{{ home_dir }}/jenkins_home"
     state: directory
@@ -55,6 +59,7 @@
     - slave3
 
 - name: start jenkins master docker container
+  become: yes
   shell:  docker run -p 8080:8080  --rm -d -v /home/vagrant/jenkins_home:/var/jenkins_home jenkins/jenkins
   ignore_errors:  yes
 

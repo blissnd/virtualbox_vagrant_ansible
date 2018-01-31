@@ -1,5 +1,6 @@
 ---
 - name: create swarm
+  become: yes
   shell:  "docker swarm init --advertise-addr 192.168.2.20"
   register: docker_swarm_master_token_output
   ignore_errors: yes
