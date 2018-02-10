@@ -64,7 +64,7 @@
   ignore_errors:  yes
 
 - name: delay
-  wait_for: timeout=30
+  wait_for: timeout=40
 
 - name: copy command to get jenkins crumb to jenkins master
   template:
